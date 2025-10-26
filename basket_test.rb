@@ -10,11 +10,17 @@ describe 'Basket' do
       { product_code: 'G01', price: 24.95 },
       { product_code: 'B01', price: 7.95 }
     ]
-    @basket = Basket.new(catalogue: @catalogue)
+
+    @delivery_charge_rules = [
+      { cost_under: 50, charge: 4.95 },
+      { cost_under: 90, charge: 2.95 }
+    ]
+
+    @basket = Basket.new(catalogue: @catalogue, delivery_charge_rules: @delivery_charge_rules)
   end
 
   def create_basket_with_items(items)
-    basket = Basket.new(catalogue: @catalogue)
+    basket = Basket.new(catalogue: @catalogue, delivery_charge_rules: @delivery_charge_rules)
     items.each { |item| basket.add(item) }
     basket
   end
@@ -40,7 +46,7 @@ describe 'Basket' do
   describe '#total' do
     it 'returns the total of all basket items' do
       basket = create_basket_with_items(%w[R01 B01])
-      _(basket.total).must_equal 40.90
+      _(basket.total).must_equal 45.85
     end
   end
 end
