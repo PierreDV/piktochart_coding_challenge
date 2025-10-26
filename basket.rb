@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 class Basket
-  attr_reader :catalogue, :delivery_charge_rules, :items
+  attr_reader :catalogue, :delivery_charge_rules, :items, :offers
 
-  def initialize(catalogue:, delivery_charge_rules:)
+  def initialize(catalogue:, delivery_charge_rules:, offers:)
     @catalogue = catalogue
     @delivery_charge_rules = delivery_charge_rules.sort_by { |charge_rule| charge_rule[:cost_under] }
     @items = []
+    @offers = offers
   end
 
   def add(product_code)
@@ -18,8 +19,9 @@ class Basket
   end
 
   def total
-    items_total = items.sum { |item| price_for(item) }.floor(2)
-    items_total + delivery_charge(items_total)
+    subtotal = items.sum { |item| price_for(item) }
+    discounted_subtotal = subtotal - discount
+    (discounted_subtotal + delivery_charge(discounted_subtotal)).floor(2)
   end
 
   private
@@ -27,6 +29,10 @@ class Basket
   def delivery_charge(items_total)
     applicable_rule = delivery_charge_rules.find { |rule| items_total < rule[:cost_under] }
     applicable_rule ? applicable_rule[:charge] : 0
+  end
+
+  def discount
+    offers.sum { |offer| offer.apply(catalogue: catalogue, items: items) }
   end
 
   def valid_product_code?(product_code)
