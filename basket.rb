@@ -16,9 +16,17 @@ class Basket
     items << product_code
   end
 
+  def total
+    items.sum { |item| price_for(item) }.floor(2)
+  end
+
   private
 
   def valid_product_code?(product_code)
     catalogue.any? { |catalogue_item| catalogue_item[:product_code] == product_code }
+  end
+
+  def price_for(product_code)
+    catalogue.find { |catalogue_item| catalogue_item[:product_code] == product_code }[:price]
   end
 end
