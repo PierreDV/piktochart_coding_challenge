@@ -21,8 +21,8 @@ This will execute the included Minitest suite and verify that the basket logic w
 The core logic is contained within the `Basket` class.
 
 `Basket` instances are initialized with three inputs:
-- a **product catalogue** (array of hashes containing product codes and prices),
-- a set of **delivery charge rules**, and
+- a **product catalogue** (array of hashes containing product codes and prices).
+- a set of **delivery charge rules**.
 - a list of **offers**.
 
 ### `Basket` Class
@@ -36,11 +36,11 @@ The basket exposes two main methods:
   1. Calculating the subtotal of all items.
   2. Applying any discounts from active offers.
   3. Determining the appropriate delivery charge based on the **discounted total**.
-  4. Returning the final total, formatted as USD currency string.
+  4. Returning the final total, formatted as a USD currency string.
 
 ### `Offers` Module
 
-The `Offers` module contains special pricing rules that can be easily extended by adding new classes.
+The `Offers` module contains special pricing rules that can be extended by adding new classes.
 
 An included example offer is the `BuyOneGetSecondHalfPrice` class.
 This class can be initialized with a specific `product_code` (e.g. `'R01'`) and includes an `apply` method which:
@@ -59,7 +59,7 @@ For example:
 - Output of `total` is always formatted into USD currency.
 - The buy-one-get-second-half-price offer applies **per pair** of items.
   (e.g. 3 red widgets → 1 discounted, 4 red widgets → 2 discounted).
-- The basket expects `catalogue` and `delivery_charge_rules` to be provided at initialization. And for `offers` to be an optional argument.
+- The basket expects `catalogue` and `delivery_charge_rules` to be provided at initialization, and for `offers` to be an optional argument.
 
 ## Example Usage
 
