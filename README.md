@@ -23,7 +23,7 @@ The core logic is contained within the `Basket` class.
 `Basket` instances are initialized with three inputs:
 - a **product catalogue** (array of hashes containing product codes and prices).
 - a set of **delivery charge rules**.
-- a list of **offers**.
+- an optional list of **offers**.
 
 ### `Basket` Class
 
@@ -34,8 +34,8 @@ The basket exposes two main methods:
 
 - `total` – calculates the overall cost of the basket by:
   1. Calculating the subtotal of all items.
-  2. Applying any discounts from active offers.
-  3. Determining the appropriate delivery charge based on the **discounted total**.
+  2. Applying any discounts from passed in offers.
+  3. Determining the appropriate delivery charge based on the discounted total.
   4. Returning the final total, formatted as a USD currency string.
 
 ### `Offers` Module
@@ -52,11 +52,13 @@ For example:
 - Buy 2 red widgets → 1 half price  
 - Buy 4 red widgets → 2 half price
 
+The `Basket` will makes use of this `apply` method in it's `total` method.
+
 ## Assumptions Made
 
 - Discounts are applied **before** calculating delivery charges.
 - Totals are always **rounded down** to two decimal places.
-- Output of `total` is always formatted into USD currency.
+- Output of `total` is always formatted into **USD** currency.
 - The buy-one-get-second-half-price offer applies **per pair** of items.
   (e.g. 3 red widgets → 1 discounted, 4 red widgets → 2 discounted).
 - The basket expects `catalogue` and `delivery_charge_rules` to be provided at initialization, and for `offers` to be an optional argument.
