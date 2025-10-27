@@ -4,7 +4,7 @@ Peter de Verteuil's submission for the **Acme Widget Co** coding challenge.
 
 ## Installation and Testing Instructions
 
-You’ll need to have **Ruby** installed on your system to run the tests.
+You’ll need to have **Ruby** installed on your system. This project requires **Ruby version 2.7 or newer** to run the tests.
 
 To install and test, run the following commands in your terminal:
 

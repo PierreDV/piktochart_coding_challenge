@@ -36,7 +36,7 @@ class Basket
   end
 
   def discount
-    offers.sum { |offer| offer.apply(catalogue: catalogue, items: items) }
+    offers.sum { |offer| offer.apply(catalogue:, items:) }
   end
 
   def valid_product_code?(product_code)
