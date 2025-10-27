@@ -3,9 +3,9 @@
 class Basket
   attr_reader :catalogue, :delivery_charge_rules, :items, :offers
 
-  def initialize(catalogue:, delivery_charge_rules:, offers:)
+  def initialize(catalogue:, delivery_charge_rules:, offers: [])
     @catalogue = catalogue
-    @delivery_charge_rules = delivery_charge_rules.sort_by { |charge_rule| charge_rule[:cost_under] }
+    @delivery_charge_rules = delivery_charge_rules
     @items = []
     @offers = offers
   end
@@ -21,14 +21,17 @@ class Basket
   def total
     subtotal = items.sum { |item| price_for(item) }
     discounted_subtotal = subtotal - discount
-    (discounted_subtotal + delivery_charge(discounted_subtotal)).floor(2)
+    total_amount = (discounted_subtotal + delivery_charge(discounted_subtotal))
+    format('$%.2f', (total_amount * 100).floor / 100.0)
   end
 
   private
 
   def delivery_charge(items_total)
-    applicable_rule = delivery_charge_rules.find { |rule| items_total < rule[:cost_under] }
-    applicable_rule ? applicable_rule[:charge] : 0
+    applicable_rules = delivery_charge_rules.select { |rule| items_total < rule[:cost_under] }
+    return 0 if applicable_rules.empty?
+
+    applicable_rules.min_by { |rule| rule[:cost_under] }[:charge]
   end
 
   def discount

@@ -2,7 +2,7 @@
 
 module Offers
   class BuyOneGetSecondHalfPrice
-    attr_accessor :product_code
+    attr_reader :product_code
 
     def initialize(product_code:)
       @product_code = product_code
@@ -13,10 +13,8 @@ module Offers
       pairs = count / 2
       return 0 if pairs.zero?
 
-      product = catalogue.find { |entry| entry[:product_code] == product_code }
-      return 0 unless product
-
-      pairs * (product[:price] / 2)
+      price = catalogue.find { |entry| entry[:product_code] == product_code }[:price]
+      pairs * (price / 2)
     end
   end
 end
