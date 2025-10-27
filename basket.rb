@@ -22,7 +22,8 @@ class Basket
     subtotal = items.sum { |item| price_for(item) }
     discounted_subtotal = subtotal - discount
     total_amount = (discounted_subtotal + delivery_charge(discounted_subtotal))
-    format('$%.2f', (total_amount * 100).floor / 100.0)
+    total_amount_rounded_down = (total_amount * 100).floor / 100.0
+    format('$%.2f', total_amount_rounded_down)
   end
 
   private
