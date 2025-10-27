@@ -2,6 +2,7 @@
 
 require 'minitest/autorun'
 require_relative 'basket'
+require_relative 'offers/buy_one_get_second_half_price'
 
 describe 'Basket' do
   def setup
@@ -11,42 +12,79 @@ describe 'Basket' do
       { product_code: 'B01', price: 7.95 }
     ]
 
-    @delivery_charge_rules = [
-      { cost_under: 50, charge: 4.95 },
-      { cost_under: 90, charge: 2.95 }
-    ]
-
-    @basket = Basket.new(catalogue: @catalogue, delivery_charge_rules: @delivery_charge_rules)
+    @delivery_charge_rules =
+      [
+        { cost_under: 50, charge: 4.95 },
+        { cost_under: 90, charge: 2.95 }
+      ]
   end
 
-  def create_basket_with_items(items)
-    basket = Basket.new(catalogue: @catalogue, delivery_charge_rules: @delivery_charge_rules)
+  def new_basket
+    Basket.new(
+      catalogue: @catalogue,
+      delivery_charge_rules: @delivery_charge_rules,
+      offers: [Offers::BuyOneGetSecondHalfPrice.new(product_code: 'R01')]
+    )
+  end
+
+  def basket_with_items(items)
+    basket = new_basket
     items.each { |item| basket.add(item) }
     basket
   end
 
   describe '#initialize' do
     it 'initializes with an empty basket' do
-      _(@basket.items).must_equal []
+      basket = new_basket
+      _(basket.items).must_equal []
     end
   end
 
   describe '#add' do
     it 'adds a product to the basket' do
-      @basket.add('B01')
-      _(@basket.items).must_equal ['B01']
+      basket = new_basket
+      basket.add('B01')
+      _(basket.items).must_equal ['B01']
     end
 
-    it 'raises an error if product code is not included in catalogue' do
-      error = _ { @basket.add('NOGOOD') }.must_raise ArgumentError
+    it 'raises an error if product code is not in catalogue' do
+      basket = new_basket
+      error = _ { basket.add('NOGOOD') }.must_raise ArgumentError
       _(error.message).must_equal 'Product code NOGOOD is not included in the catalogue.'
     end
   end
 
   describe '#total' do
-    it 'returns the total of all basket items' do
-      basket = create_basket_with_items(%w[R01 B01])
-      _(basket.total).must_equal 45.85
+    it 'calculates total for blue and green widget with delivery' do
+      basket = basket_with_items(%w[B01 G01])
+      _(basket.total).must_equal '$37.85'
+    end
+
+    it 'calculates total with buy one get second half price offer' do
+      basket = basket_with_items(%w[R01 R01])
+      _(basket.total).must_equal '$54.37'
+    end
+
+    it 'applies half price offer twice when buying four red widgets' do
+      basket = basket_with_items(%w[R01 R01 R01 R01])
+      _(basket.total).must_equal '$98.85'
+    end
+
+    it 'calculates the totals correctly when no offers provided' do
+      basket = Basket.new(catalogue: @catalogue, delivery_charge_rules: @delivery_charge_rules)
+      basket.add('R01')
+      basket.add('R01')
+      _(basket.total).must_equal '$68.85'
+    end
+
+    it 'calculates total for red and green widget with reduced delivery' do
+      basket = basket_with_items(%w[R01 G01])
+      _(basket.total).must_equal '$60.85'
+    end
+
+    it 'calculates total with multiple discounts and free delivery' do
+      basket = basket_with_items(%w[B01 B01 R01 R01 R01])
+      _(basket.total).must_equal '$98.27'
     end
   end
 end
